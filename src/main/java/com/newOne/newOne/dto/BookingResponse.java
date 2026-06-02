@@ -13,5 +13,7 @@ public record BookingResponse(
 		BigDecimal totalPrice,
 		LocalDateTime bookedAt,
 		String passengerUsername,
+		boolean checkedIn,
+		String boardingPassNumber,
 		FlightResponse flight) {
 }

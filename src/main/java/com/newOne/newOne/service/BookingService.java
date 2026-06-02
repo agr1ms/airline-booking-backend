@@ -18,6 +18,7 @@ import com.newOne.newOne.entity.BookingStatus;
 import com.newOne.newOne.entity.Flight;
 import com.newOne.newOne.entity.User;
 import com.newOne.newOne.exception.ApiException;
+import com.newOne.newOne.repository.BoardingPassRepository;
 import com.newOne.newOne.repository.BookingRepository;
 import com.newOne.newOne.repository.FlightRepository;
 import com.newOne.newOne.repository.UserRepository;
@@ -29,16 +30,19 @@ public class BookingService {
 	private final FlightRepository flightRepository;
 	private final UserRepository userRepository;
 	private final FlightService flightService;
+	private final BoardingPassRepository boardingPassRepository;
 
 	public BookingService(
 			BookingRepository bookingRepository,
 			FlightRepository flightRepository,
 			UserRepository userRepository,
-			FlightService flightService) {
+			FlightService flightService,
+			BoardingPassRepository boardingPassRepository) {
 		this.bookingRepository = bookingRepository;
 		this.flightRepository = flightRepository;
 		this.userRepository = userRepository;
 		this.flightService = flightService;
+		this.boardingPassRepository = boardingPassRepository;
 	}
 
 	public List<BookingResponse> myBookings() {
@@ -83,6 +87,9 @@ public class BookingService {
 		if (booking.getStatus() == BookingStatus.CANCELLED) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "Booking already cancelled");
 		}
+		if (boardingPassRepository.existsByBookingId(bookingId)) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot cancel after check-in");
+		}
 		if (booking.getFlight().getDepartureTime().isBefore(LocalDateTime.now())) {
 			throw new ApiException(HttpStatus.BAD_REQUEST, "Cannot cancel after departure");
 		}
@@ -96,6 +103,7 @@ public class BookingService {
 
 	private BookingResponse toResponse(Booking booking) {
 		FlightResponse flight = flightService.toResponse(booking.getFlight());
+		var boardingPass = boardingPassRepository.findByBookingId(booking.getId());
 		return new BookingResponse(
 				booking.getId(),
 				booking.getTicketNumber(),
@@ -104,6 +112,8 @@ public class BookingService {
 				booking.getTotalPrice(),
 				booking.getCreatedAt(),
 				booking.getPassenger().getUsername(),
+				boardingPass.isPresent(),
+				boardingPass.map(bp -> bp.getBoardingPassNumber()).orElse(null),
 				flight);
 	}
 
