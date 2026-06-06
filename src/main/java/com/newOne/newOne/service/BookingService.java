@@ -56,6 +56,11 @@ public class BookingService {
 	public BookingResponse createBooking(BookingRequest request) {
 		User passenger = userRepository.findByUsername(currentUsername())
 				.orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+		if (!passenger.isAadharVerified()) {
+			throw new ApiException(HttpStatus.BAD_REQUEST, "Passenger is not Aadhar verified. Aadhar verification is mandatory to book tickets.");
+		}
+
 		Flight flight = flightRepository.findById(request.flightId())
 				.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Flight not found"));
 

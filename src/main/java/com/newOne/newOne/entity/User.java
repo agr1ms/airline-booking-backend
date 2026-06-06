@@ -23,9 +23,18 @@ public class User {
 	@Column(nullable = false)
 	private String password;
 
-	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
 	private UserRole role = UserRole.USER;
+
+	@Column(unique = true, nullable = true)
+	private String aadharNumber;
+
+	@Column(nullable = true)
+	private String aadharFileName;
+
+	@Column(nullable = false)
+	private boolean aadharVerified = false;
 
 	public User() {
 	}
@@ -66,5 +75,29 @@ public class User {
 
 	public void setRole(UserRole role) {
 		this.role = role;
+	}
+
+	public String getAadharNumber() {
+		return aadharNumber;
+	}
+
+	public void setAadharNumber(String aadharNumber) {
+		this.aadharNumber = aadharNumber;
+	}
+
+	public String getAadharFileName() {
+		return aadharFileName;
+	}
+
+	public void setAadharFileName(String aadharFileName) {
+		this.aadharFileName = aadharFileName;
+	}
+
+	public boolean isAadharVerified() {
+		return aadharVerified;
+	}
+
+	public void setAadharVerified(boolean aadharVerified) {
+		this.aadharVerified = aadharVerified;
 	}
 }
