@@ -20,19 +20,23 @@ public class DataSeeder implements CommandLineRunner {
 	private final FlightRepository flightRepository;
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final com.newOne.newOne.repository.AirportRepository airportRepository;
 
 	public DataSeeder(
 			FlightRepository flightRepository,
 			UserRepository userRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder,
+			com.newOne.newOne.repository.AirportRepository airportRepository) {
 		this.flightRepository = flightRepository;
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.airportRepository = airportRepository;
 	}
 
 	@Override
 	public void run(String... args) {
 		seedAdminUser();
+		seedAirports();
 		if (flightRepository.count() > 0) {
 			return;
 		}
@@ -40,6 +44,15 @@ public class DataSeeder implements CommandLineRunner {
 		seed("AI202", "MUMBAI", "BENGALURU", 8, 2, 160, "4900.00");
 		seed("AI303", "DELHI", "BENGALURU", 10, 2, 190, "6100.00");
 		seed("AI404", "KOLKATA", "DELHI", 12, 2, 170, "5300.00");
+	}
+
+	private void seedAirports() {
+		if (airportRepository.count() == 0) {
+			airportRepository.save(new com.newOne.newOne.entity.Airport("DEL", "Indira Gandhi International Airport", "Delhi", "India"));
+			airportRepository.save(new com.newOne.newOne.entity.Airport("BOM", "Chhatrapati Shivaji Maharaj International Airport", "Mumbai", "India"));
+			airportRepository.save(new com.newOne.newOne.entity.Airport("BLR", "Kempegowda International Airport", "Bengaluru", "India"));
+			airportRepository.save(new com.newOne.newOne.entity.Airport("CCU", "Netaji Subhash Chandra Bose International Airport", "Kolkata", "India"));
+		}
 	}
 
 	private void seedAdminUser() {
